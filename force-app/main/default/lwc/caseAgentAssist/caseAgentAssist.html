@@ -1,0 +1,271 @@
+<template>
+    <lightning-card title="AI Agent Assist & Live Booking Console" icon-name="standard:service_crew_member">
+        
+        <!-- Action Header Buttons -->
+        <div slot="actions" class="slds-grid slds-grid_vertical-align-center slds-m-bottom_none">
+            <span class={statusBadgeClass}>{currentAssistanceStatus}</span>
+            <lightning-button-icon
+                icon-name="utility:refresh"
+                variant="border-filled"
+                alternative-text="Refresh AI & Booking Data"
+                title="Refresh"
+                onclick={handleRefresh}
+                class="slds-m-left_small"
+                disabled={isLoading}>
+            </lightning-button-icon>
+        </div>
+
+        <!-- Spinner -->
+        <template if:true={isLoading}>
+            <lightning-spinner alternative-text="Loading AI Insights..." size="medium"></lightning-spinner>
+        </template>
+
+        <div class="slds-p-around_medium console-container">
+
+            <!-- ─── 1. External Booking Integration Card ─── -->
+            <div class="card-section booking-card slds-m-bottom_medium">
+                <div class="section-header slds-grid slds-grid_vertical-align-center">
+                    <lightning-icon icon-name="standard:asset_relationship" size="small" class="slds-m-right_x-small"></lightning-icon>
+                    <h3 class="section-title">Live Reservation Context</h3>
+                    <div class="slds-col_bump-left">
+                        <lightning-button
+                            label="Sync Booking"
+                            icon-name="utility:sync"
+                            variant="neutral"
+                            size="small"
+                            onclick={handleSyncBooking}
+                            disabled={isLoading}>
+                        </lightning-button>
+                    </div>
+                </div>
+
+                <div class="slds-grid slds-wrap slds-gutters_small slds-m-top_x-small">
+                    <div class="slds-col slds-size_1-of-2 slds-medium-size_2-of-12">
+                        <span class="field-label">Reference</span>
+                        <div class="field-value booking-ref">{bookingReference}</div>
+                    </div>
+                    <div class="slds-col slds-size_1-of-2 slds-medium-size_2-of-12">
+                        <span class="field-label">Booking Status</span>
+                        <div><span class={bookingStatusBadgeClass}>{bookingStatus}</span></div>
+                    </div>
+                    <div class="slds-col slds-size_1-of-2 slds-medium-size_3-of-12">
+                        <span class="field-label">Supplier</span>
+                        <div class="field-value">{supplierName}</div>
+                    </div>
+                    <div class="slds-col slds-size_1-of-2 slds-medium-size_2-of-12">
+                        <span class="field-label">Vehicle</span>
+                        <div class="field-value">{vehicleClass}</div>
+                    </div>
+                    <div class="slds-col slds-size_1-of-2 slds-medium-size_3-of-12">
+                        <span class="field-label">Pickup Location</span>
+                        <div class="field-value">{pickupLocation}</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ─── 2. AI Intelligence & Grounding Bar ─── -->
+            <div class="card-section ai-insights-card slds-m-bottom_medium">
+                <div class="section-header slds-grid slds-grid_vertical-align-center">
+                    <lightning-icon icon-name="standard:einstein" size="small" class="slds-m-right_x-small"></lightning-icon>
+                    <h3 class="section-title">AI Triage & Enterprise Grounding</h3>
+                    <div class="slds-col_bump-left">
+                        <template if:true={aiRec.groundedStatus}>
+                            <span class="grounded-pill">
+                                <lightning-icon icon-name="utility:check" size="xx-small" variant="inverse" class="slds-m-right_xx-small"></lightning-icon>
+                                Grounded in: {aiRec.groundingArticleTitle}
+                            </span>
+                        </template>
+                    </div>
+                </div>
+
+                <!-- Triage Metrics Grid -->
+                <div class="slds-grid slds-wrap slds-gutters_small slds-m-top_small slds-grid_vertical-align-center">
+                    <div class="slds-col slds-size_1-of-3">
+                        <span class="field-label">Detected Intent</span>
+                        <div class="slds-m-top_xx-small">
+                            <span class={intentBadgeClass}>{aiRec.intent}</span>
+                        </div>
+                    </div>
+                    <div class="slds-col slds-size_1-of-3">
+                        <span class="field-label">Urgency Tier</span>
+                        <div class="slds-m-top_xx-small">
+                            <span class={urgencyBadgeClass}>{aiRec.urgency}</span>
+                        </div>
+                    </div>
+                    <div class="slds-col slds-size_1-of-3">
+                        <span class="field-label">Model Confidence</span>
+                        <div class="confidence-container slds-m-top_xx-small">
+                            <div class="confidence-bar-bg">
+                                <div class="confidence-bar-fill" style={confidenceBarStyle}></div>
+                            </div>
+                            <span class="confidence-text">{confidencePercentage}%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Case Summary Quote -->
+                <div class="summary-box slds-m-top_small">
+                    <div class="summary-label">Executive Case Summary</div>
+                    <p class="summary-text">{aiRec.caseSummary}</p>
+                </div>
+            </div>
+
+            <!-- ─── 3. Guardrail Circuit Breaker (Restricted State) ─── -->
+            <template if:true={aiRec.isRestricted}>
+                <div class="guardrail-alert slds-m-bottom_medium">
+                    <div class="slds-grid slds-grid_vertical-align-center">
+                        <lightning-icon icon-name="utility:warning" variant="error" size="medium" class="slds-m-right_small"></lightning-icon>
+                        <div>
+                            <h4 class="guardrail-title">AI Draft Restricted by Safety Guardrail</h4>
+                            <p class="guardrail-desc">{aiRec.restrictionReason}</p>
+                        </div>
+                    </div>
+                    <div class="slds-m-top_small slds-text-align_right">
+                        <lightning-button
+                            label="Escalate to Senior Specialist"
+                            variant="destructive"
+                            icon-name="utility:forward"
+                            onclick={openEscalateModal}>
+                        </lightning-button>
+                    </div>
+                </div>
+            </template>
+
+            <!-- ─── 4. Grounded Draft Response & Human Action Gate ─── -->
+            <template if:false={aiRec.isRestricted}>
+                <div class="card-section draft-card slds-m-bottom_medium">
+                    <div class="section-header slds-grid slds-grid_vertical-align-center">
+                        <lightning-icon icon-name="standard:email" size="small" class="slds-m-right_x-small"></lightning-icon>
+                        <h3 class="section-title">Grounded Draft Customer Response</h3>
+                        <div class="slds-col_bump-left slds-text-color_weak slds-text-body_small">
+                            Human-in-the-Loop Review Required
+                        </div>
+                    </div>
+
+                    <div class="slds-m-top_small">
+                        <lightning-textarea
+                            label="Response Text (Editable by Agent)"
+                            value={draftText}
+                            onchange={handleDraftChange}
+                            rows="9"
+                            class="draft-textarea">
+                        </lightning-textarea>
+                    </div>
+
+                    <!-- Action Bar -->
+                    <div class="action-bar slds-grid slds-grid_align-spread slds-m-top_medium slds-grid_vertical-align-center">
+                        <div class="slds-text-body_small slds-text-color_weak">
+                            Chars: {draftCharCount} | Words: {draftWordCount}
+                        </div>
+                        <div class="slds-grid slds-gutters_xx-small">
+                            <div class="slds-col">
+                                <lightning-button
+                                    label="Approve & Send"
+                                    variant="brand"
+                                    icon-name="utility:check"
+                                    onclick={handleApprove}
+                                    disabled={isLoading}
+                                    class="approve-btn">
+                                </lightning-button>
+                            </div>
+                            <div class="slds-col">
+                                <lightning-button
+                                    label="Save Edits"
+                                    variant="neutral"
+                                    icon-name="utility:edit"
+                                    onclick={handleSaveEdits}
+                                    disabled={isSaveEditsDisabled}>
+                                </lightning-button>
+                            </div>
+                            <div class="slds-col">
+                                <lightning-button
+                                    label="Reject"
+                                    variant="destructive-text"
+                                    icon-name="utility:close"
+                                    onclick={openRejectModal}
+                                    disabled={isLoading}>
+                                </lightning-button>
+                            </div>
+                            <div class="slds-col">
+                                <lightning-button
+                                    label="Escalate"
+                                    variant="border"
+                                    icon-name="utility:forward"
+                                    onclick={openEscalateModal}
+                                    disabled={isLoading}>
+                                </lightning-button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </template>
+
+            <!-- ─── 5. Recent AI Audit Log Activity ─── -->
+            <template if:true={hasRecentInteractions}>
+                <div class="card-section audit-card">
+                    <div class="section-header slds-grid slds-grid_vertical-align-center slds-m-bottom_x-small">
+                        <lightning-icon icon-name="standard:logging" size="small" class="slds-m-right_x-small"></lightning-icon>
+                        <h3 class="section-title">Recent AI Audit Interactions</h3>
+                    </div>
+
+                    <table class="slds-table slds-table_cell-buffer slds-table_bordered audit-table">
+                        <thead>
+                            <tr class="slds-line-height_reset">
+                                <th scope="col">Task</th>
+                                <th scope="col">Action Taken</th>
+                                <th scope="col">Confidence</th>
+                                <th scope="col">Grounded</th>
+                                <th scope="col">Override Reason</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template for:each={recentInteractions} for:item="item">
+                                <tr key={item.Id}>
+                                    <td>{item.AI_Task__c}</td>
+                                    <td><span class={item.actionClass}>{item.Agent_Action__c}</span></td>
+                                    <td>{item.confidenceFormatted}%</td>
+                                    <td>
+                                        <lightning-icon
+                                            icon-name={item.groundedIcon}
+                                            size="xx-small"
+                                            variant={item.groundedVariant}>
+                                        </lightning-icon>
+                                    </td>
+                                    <td class="override-cell">{item.Override_Reason__c}</td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+            </template>
+
+        </div>
+
+        <!-- ─── Action Reason Modal (Reject / Escalate) ─── -->
+        <template if:true={isModalOpen}>
+            <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_small">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <h2 class="slds-modal__title slds-hyphenate">{modalTitle}</h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium">
+                        <p class="slds-m-bottom_small slds-text-color_weak">{modalDescription}</p>
+                        <lightning-textarea
+                            label="Reason / Notes (Required for Audit Logging)"
+                            value={modalReason}
+                            onchange={handleModalReasonChange}
+                            required
+                            placeholder="Enter reason for rejection or escalation...">
+                        </lightning-textarea>
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <lightning-button label="Cancel" variant="neutral" onclick={closeModal} class="slds-m-right_x-small"></lightning-button>
+                        <lightning-button label="Confirm Action" variant="brand" onclick={handleConfirmModalAction} disabled={isModalConfirmDisabled}></lightning-button>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </template>
+
+    </lightning-card>
+</template>

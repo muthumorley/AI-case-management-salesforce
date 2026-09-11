@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Confidence_Score__c</fullName>
+    <description>AI confidence score between 0.00 and 1.00. Scores below 0.70 trigger the low-confidence guardrail and suppress the AI suggestion.</description>
+    <label>Confidence Score</label>
+    <precision>4</precision>
+    <scale>2</scale>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

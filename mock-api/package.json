@@ -1,0 +1,23 @@
+{
+  "name": "ai-case-management-mock-booking-api",
+  "version": "1.0.0",
+  "description": "Lightweight mock booking REST API for the AI-Assisted Case Management System portfolio project. Simulates an external car rental reservation system for Salesforce integration testing.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "mock-api",
+    "rest",
+    "salesforce",
+    "portfolio"
+  ],
+  "author": "Muthukumar",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2"
+  }
+}

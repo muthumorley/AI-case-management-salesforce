@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Grounded_Status__c</fullName>
+    <description>True if the AI suggestion was generated using content retrieved from Salesforce Knowledge articles. False if generated without a grounded source (increases risk of inaccuracy).</description>
+    <label>Grounded in Knowledge</label>
+    <defaultValue>false</defaultValue>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

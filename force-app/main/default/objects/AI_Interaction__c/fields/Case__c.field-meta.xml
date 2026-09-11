@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Case__c</fullName>
+    <description>Lookup to the parent Case record this AI interaction is associated with.</description>
+    <label>Case</label>
+    <referenceTo>Case</referenceTo>
+    <relationshipLabel>AI Interactions</relationshipLabel>
+    <relationshipName>AI_Interactions</relationshipName>
+    <required>true</required>
+    <deleteConstraint>Restrict</deleteConstraint>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

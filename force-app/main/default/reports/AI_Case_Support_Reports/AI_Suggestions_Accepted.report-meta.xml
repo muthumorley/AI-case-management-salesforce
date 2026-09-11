@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Report xmlns="http://soap.sforce.com/2006/04/metadata">
+    <columns>
+        <field>CUST_NAME</field>
+    </columns>
+    <columns>
+        <field>AI_Interaction__c.Case__c</field>
+    </columns>
+    <columns>
+        <field>AI_Interaction__c.AI_Task__c</field>
+    </columns>
+    <columns>
+        <aggregateTypes>Average</aggregateTypes>
+        <field>AI_Interaction__c.Confidence_Score__c</field>
+    </columns>
+    <columns>
+        <field>AI_Interaction__c.Grounded_Status__c</field>
+    </columns>
+    <columns>
+        <field>CUST_CREATED_DATE</field>
+    </columns>
+    <description>Audit tracking of all AI recommendations accepted without modifications by support agents.</description>
+    <filter>
+        <criteriaItems>
+            <column>AI_Interaction__c.Agent_Action__c</column>
+            <isUnlocked>true</isUnlocked>
+            <operator>equals</operator>
+            <value>Accepted</value>
+        </criteriaItems>
+    </filter>
+    <format>Summary</format>
+    <groupingsDown>
+        <dateGranularity>Day</dateGranularity>
+        <field>AI_Interaction__c.Agent_Action__c</field>
+        <sortOrder>Asc</sortOrder>
+    </groupingsDown>
+    <name>AI Suggestions Accepted</name>
+    <params>
+        <name>co</name>
+        <value>1</value>
+    </params>
+    <reportType>CustomEntity$AI_Interaction__c</reportType>
+    <scope>organization</scope>
+    <showDetails>true</showDetails>
+    <showGrandTotal>true</showGrandTotal>
+    <showSubTotals>true</showSubTotals>
+    <timeFrameFilter>
+        <dateColumn>CUST_CREATED_DATE</dateColumn>
+        <interval>INTERVAL_CUSTOM</interval>
+    </timeFrameFilter>
+</Report>
